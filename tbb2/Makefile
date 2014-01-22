@@ -2,8 +2,8 @@ INCDIR=
 LIBDIR=
 LIBS=-ltbbmalloc -ltbb
 CC=g++
-DEFINES=-DTBB_USE_CAPTURED_EXCEPTION=1
+#DEFINES=-DTBB_USE_CAPTURED_EXCEPTION=1
 
-edsl: edsl.cpp
-	$(CC) -std=c++0x -g $(DEFINES) $(INCDIR) $(LIBDIR) edsl.cpp $(LIBS) -o edsl 
+edsl: edsl.h main.cpp
+	$(CC) -std=c++0x -g $(DEFINES) $(INCDIR) $(LIBDIR) main.cpp $(LIBS) -o edsl 
 
