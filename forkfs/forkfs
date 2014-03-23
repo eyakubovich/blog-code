@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [ $USER != "root" ]; then
+	echo "must be run as root"
+	exit 1
+fi
+
+tmprc=`mktemp`
+echo "PS1=\"(forkfs) \$PS1\"" >$tmprc
+
+cmd="bash --rcfile $tmprc -i"
+
+if [ -n "$SUDO_USER" ]; then
+	origuser=$SUDO_USER
+	cmd="sudo -u $SUDO_USER $cmd"
+else
+	origuser=$USER
+fi
+
+curdir=`pwd`
+tmpdir=`mktemp -d`
+
+cd ..
+chown $origuser $tmpdir $tmprc
+
+unshare -m bash <(cat <<EOF
+
+mount -t aufs -o br=$tmpdir=rw:$curdir=ro -o udba=reval none $curdir
+cd $curdir
+
+$cmd
+
+# done. unmount aufs
+cd ..
+umount $curdir
+
+EOF
+)
